@@ -78,15 +78,22 @@ export default function Home() {
         })
       });
       const data = await response.json();
-      setIsTyping(false);
-      setMessages(prev => [...prev, { text: data.message || `Error: ${data.error}`, isUser: false }]);
-    } catch (error) {
-      setIsTyping(false);
-      setMessages(prev => [...prev, { text: 'Something went wrong.', isUser: false }]);
-    } finally {
-      setIsSending(false);
-    }
-  };
+setIsTyping(false);
+
+if (data.error) {
+  // Sprawdzamy, czy błąd to limit zapytań
+  const isRateLimit = data.error.toLowerCase().includes('rate limit');
+  
+  const errorMessage = isRateLimit 
+    ? (lang === 'pl' 
+        ? "Łukasz ma teraz sporo zapytań! 🚀 Limit AI został tymczasowo wyczerpany. Spróbuj ponownie za 15-20 min lub napisz do mnie na LinkedIn." 
+        : "High demand! 🚀 AI rate limit reached. Please try again in 15-20 min or reach out via LinkedIn.")
+    : (lang === 'pl' ? "Coś poszło nie tak. Spróbuj ponownie." : "Something went wrong. Please try again.");
+
+  setMessages(prev => [...prev, { text: errorMessage, isUser: false }]);
+} else {
+  setMessages(prev => [...prev, { text: data.message, isUser: false }]);
+} 
 
   const analyzeJob = async () => {
   if (!jobDescription.trim() || isAnalyzing) return;
