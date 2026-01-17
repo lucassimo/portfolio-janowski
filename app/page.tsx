@@ -188,7 +188,13 @@ export default function Home() {
               {messages.map((msg, idx) => (
                 <div key={idx} className={`message ${msg.isUser ? 'user' : 'bot'}`}>{msg.text}</div>
               ))}
-              {isTyping && <div className="message bot typing">...</div>}
+              {isTyping && (
+  <div className="message bot typing">
+    <span className="typing-dot"></span>
+    <span className="typing-dot"></span>
+    <span className="typing-dot"></span>
+  </div>
+)}
               <div ref={messagesEndRef} />
             </div>
 
@@ -387,6 +393,99 @@ export default function Home() {
           .input-row button { padding: 0.75rem; }
           .container { padding: 0 1rem; }
         }
+          .tag {
+  opacity: 0;
+  animation: tagIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Każdy kolejny tag pojawia się z opóźnieniem */
+.tag:nth-child(1) { animation-delay: 0.1s; }
+.tag:nth-child(2) { animation-delay: 0.15s; }
+.tag:nth-child(3) { animation-delay: 0.2s; }
+.tag:nth-child(4) { animation-delay: 0.25s; }
+.tag:nth-child(5) { animation-delay: 0.3s; }
+.tag:nth-child(6) { animation-delay: 0.35s; }
+
+@keyframes tagIn {
+  from { opacity: 0; transform: translateX(-10px) rotate(-2deg); }
+  to { opacity: 1; transform: translateX(0) rotate(0); }
+}
+
+/* --- 2. Interaktywne Przyciski (Neubrutalism feel) --- */
+button, .tag {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--text) !important;
+}
+
+button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0 var(--text) !important;
+}
+
+/* --- 3. Pulsujący wskaźnik Job Match --- */
+.traffic-light {
+  position: relative;
+  overflow: hidden;
+  animation: slideInResult 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Efekt poświaty wokół koloru */
+.traffic-light::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  box-shadow: inset 0 0 20px rgba(255,255,255,0.5);
+  animation: pulseGlow 2s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulseGlow {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.3; }
+}
+
+/* --- 4. Efekt pisania bota (bardziej naturalny) --- */
+.message.bot.typing {
+  display: flex;
+  gap: 4px;
+  padding: 0.8rem 1.2rem;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-8px); }
+}
+
+/* --- 5. Płynne pojawianie się tekstu analizy --- */
+.analysis-text {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInResult {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
       `}</style>
     </>
   );
