@@ -485,30 +485,24 @@ const getTrafficLight = (analysis: string, lang: 'en' | 'pl') => {
         }
 
         @keyframes msgPop {
-          from {
-            opacity: 0;
-            transform: scale(0.9) translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
+          from { opacity: 0; transform: scale(0.9) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         @keyframes bounce {
-          0%, 60%, 100% {
-            transform: translateY(0);
-          }
-          30% {
-            transform: translateY(-6px);
-          }
+          0%, 60%, 100% { transform: translateY(0); }
+          30% { transform: translateY(-6px); }
         }
 
         @media (max-width: 768px) {
-          .hero-grid,
-          .match-card {
-            grid-template-columns: 1fr !important;
-            gap: 2rem !important;
+          .container {
+            padding: 0 1rem;
+          }
+          h1 {
+            font-size: 2rem !important;
+          }
+          h2 {
+            font-size: 1.5rem !important;
           }
         }
       `}</style>
