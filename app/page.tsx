@@ -89,23 +89,41 @@ export default function Home() {
   };
 
   const analyzeJob = async () => {
-    if (!jobDescription.trim() || isAnalyzing) return;
-    setIsAnalyzing(true);
-    setMatchResult(null);
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: `Please assess my fit for this job:\n\n${jobDescription}` }] })
-      });
-      const data = await response.json();
-      setMatchResult({ analysis: data.message || data.error });
-    } catch (error) {
-      setMatchResult({ error: 'Analysis failed.' });
-    } finally {
-      setIsAnalyzing(false);
+  if (!jobDescription.trim() || isAnalyzing) return;
+
+  setIsAnalyzing(true);
+  setMatchResult(null);
+
+  // Dynamiczny prompt w zależności od języka
+  const prompt = lang === 'pl' 
+    ? `Oceń moje dopasowanie. Na samym początku napisz obowiązkowo: "**Fit Assessment:** [Strong Match / Partial Match / Weak Match / No Match]". Potem dodaj szczegółową analizę po polsku:\n\n${jobDescription}`
+    : `Assess my fit. Start with: "**Fit Assessment:** [Strong Match / Partial Match / Weak Match / No Match]". Then add detailed analysis in English:\n\n${jobDescription}`;
+
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{
+          role: 'user',
+          content: prompt // Używamy zmiennej prompt zamiast sztywnego tekstu
+        }]
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.error) {
+      setMatchResult({ error: data.error });
+    } else {
+      setMatchResult({ analysis: data.message });
     }
-  };
+  } catch (error) {
+    setMatchResult({ error: 'Analysis failed. Please try again.' });
+  } finally {
+    setIsAnalyzing(false);
+  }
+};
 
   return (
     <>
