@@ -286,10 +286,40 @@ export default function Home() {
         .dots span { width: 10px; height: 10px; border-radius: 50%; }
         .chat-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
         
-        .chat-messages { height: 350px; overflow-y: auto; padding: 1.25rem; display: flex; flexDirection: column; gap: 0.75rem; background: #fafafa; }
-        .message { max-width: 85%; padding: 0.75rem 1rem; border-radius: 15px; font-size: 0.9rem; line-height: 1.4; }
-        .message.user { align-self: flex-end; background: var(--text); color: #fff; border-bottom-right-radius: 4px; }
-        .message.bot { align-self: flex-start; background: #fff; border: 2px solid var(--border); border-bottom-left-radius: 4px; }
+        .chat-messages { 
+  height: 350px; 
+  overflow-y: auto; 
+  padding: 1.25rem; 
+  display: flex; 
+  flex-direction: column; /* To jest kluczowa zmiana */
+  gap: 0.75rem; 
+  background: #fafafa;
+  width: 100%; /* Upewnij się, że zajmuje całą szerokość */
+}
+
+.message { 
+  max-width: 85%; 
+  padding: 0.75rem 1rem; 
+  border-radius: 15px; 
+  font-size: 0.9rem; 
+  line-height: 1.4;
+  word-wrap: break-word; /* Zapobiega wyjeżdżaniu tekstu poza dymek */
+  display: block; /* Wymusza bycie elementem blokowym */
+  flex-shrink: 0; /* Nie pozwól dymkom się zwężać, jeśli jest ich dużo */
+  width: fit-content; /* Dymek będzie tak szeroki jak tekst, ale nie szerszy niż max-width */
+}
+
+.message.user { 
+  align-self: flex-end; /* Pcha dymek użytkownika do prawej */
+  background: var(--text); 
+  color: #fff; 
+}
+
+.message.bot { 
+  align-self: flex-start; /* Pcha dymek bota do lewej */
+  background: #fff; 
+  border: 2px solid var(--border); 
+}
         
         .chat-input-area { padding: 1rem; border-top: 2px solid var(--border); background: #fff; }
         .input-row { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
