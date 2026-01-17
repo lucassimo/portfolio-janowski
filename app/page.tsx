@@ -78,59 +78,58 @@ export default function Home() {
         })
       });
       const data = await response.json();
-setIsTyping(false);
+      setIsTyping(false);
 
-if (data.error) {
-  // Sprawdzamy, czy błąd to limit zapytań
-  const isRateLimit = data.error.toLowerCase().includes('rate limit');
-  
-  const errorMessage = isRateLimit 
-    ? (lang === 'pl' 
-        ? "Łukasz ma teraz sporo zapytań! 🚀 Limit AI został tymczasowo wyczerpany. Spróbuj ponownie za 15-20 min lub napisz do mnie na LinkedIn." 
-        : "High demand! 🚀 AI rate limit reached. Please try again in 15-20 min or reach out via LinkedIn.")
-    : (lang === 'pl' ? "Coś poszło nie tak. Spróbuj ponownie." : "Something went wrong. Please try again.");
-
-  setMessages(prev => [...prev, { text: errorMessage, isUser: false }]);
-} else {
-  setMessages(prev => [...prev, { text: data.message, isUser: false }]);
-} 
+      if (data.error) {
+        const isRateLimit = data.error.toLowerCase().includes('rate limit');
+        const errorMsg = isRateLimit 
+          ? (lang === 'pl' ? "Osiągnięto limit zapytań AI. Spróbuj ponownie za chwilę lub napisz do mnie na LinkedIn!" : "AI rate limit reached. Please try again in a moment or reach out via LinkedIn!")
+          : (lang === 'pl' ? "Wystąpił błąd. Spróbuj ponownie." : "Something went wrong. Please try again.");
+        setMessages(prev => [...prev, { text: errorMsg, isUser: false }]);
+      } else {
+        setMessages(prev => [...prev, { text: data.message, isUser: false }]);
+      }
+    } catch (error) {
+      setIsTyping(false);
+      setMessages(prev => [...prev, { text: lang === 'pl' ? 'Błąd połączenia.' : 'Connection failed.', isUser: false }]);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const analyzeJob = async () => {
-  if (!jobDescription.trim() || isAnalyzing) return;
+    if (!jobDescription.trim() || isAnalyzing) return;
+    setIsAnalyzing(true);
+    setMatchResult(null);
 
-  setIsAnalyzing(true);
-  setMatchResult(null);
+    const prompt = lang === 'pl' 
+      ? `Oceń moje dopasowanie. Na samym początku napisz obowiązkowo: "**Fit Assessment:** [Strong Match / Partial Match / Weak Match / No Match]". Potem dodaj szczegółową analizę po polsku:\n\n${jobDescription}`
+      : `Assess my fit. Start with: "**Fit Assessment:** [Strong Match / Partial Match / Weak Match / No Match]". Then add detailed analysis in English:\n\n${jobDescription}`;
 
-  // Dynamiczny prompt w zależności od języka
-  const prompt = lang === 'pl' 
-    ? `Oceń moje dopasowanie. Na samym początku napisz obowiązkowo: "**Fit Assessment:** [Strong Match / Partial Match / Weak Match / No Match]". Potem dodaj szczegółową analizę po polsku:\n\n${jobDescription}`
-    : `Assess my fit. Start with: "**Fit Assessment:** [Strong Match / Partial Match / Weak Match / No Match]". Then add detailed analysis in English:\n\n${jobDescription}`;
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
+      });
 
-  try {
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: [{
-          role: 'user',
-          content: prompt // Używamy zmiennej prompt zamiast sztywnego tekstu
-        }]
-      })
-    });
-
-    const data = await response.json();
-    
-    if (data.error) {
-      setMatchResult({ error: data.error });
-    } else {
-      setMatchResult({ analysis: data.message });
+      const data = await response.json();
+      
+      if (data.error) {
+        const isRateLimit = data.error.toLowerCase().includes('rate limit');
+        const errorMsg = isRateLimit 
+          ? (lang === 'pl' ? "Limit analiz AI wyczerpany. Spróbuj ponownie za 20 min." : "AI Analysis limit reached. Try again in 20 min.")
+          : (lang === 'pl' ? "Błąd analizy." : "Analysis failed.");
+        setMatchResult({ error: errorMsg });
+      } else {
+        setMatchResult({ analysis: data.message });
+      }
+    } catch (error) {
+      setMatchResult({ error: lang === 'pl' ? 'Błąd połączenia.' : 'Connection failed.' });
+    } finally {
+      setIsAnalyzing(false);
     }
-  } catch (error) {
-    setMatchResult({ error: 'Analysis failed. Please try again.' });
-  } finally {
-    setIsAnalyzing(false);
-  }
-};
+  };
 
   return (
     <>
@@ -196,12 +195,12 @@ if (data.error) {
                 <div key={idx} className={`message ${msg.isUser ? 'user' : 'bot'}`}>{msg.text}</div>
               ))}
               {isTyping && (
-  <div className="message bot typing">
-    <span className="typing-dot"></span>
-    <span className="typing-dot"></span>
-    <span className="typing-dot"></span>
-  </div>
-)}
+                <div className="message bot typing">
+                  <span className="typing-dot"></span>
+                  <span className="typing-dot"></span>
+                  <span className="typing-dot"></span>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
 
@@ -253,16 +252,22 @@ if (data.error) {
 
               {matchResult && (
                 <div className="match-result">
-                  {matchResult.analysis && getTrafficLight(matchResult.analysis, lang) && (
-                    <div className="traffic-light" style={{ borderColor: getTrafficLight(matchResult.analysis, lang)!.color }}>
-                      <span className="emoji">{getTrafficLight(matchResult.analysis, lang)!.emoji}</span>
-                      <div>
-                        <div className="fit-status" style={{ color: getTrafficLight(matchResult.analysis, lang)!.color }}>Assessment</div>
-                        <div className="fit-text">{getTrafficLight(matchResult.analysis, lang)!.text}</div>
-                      </div>
-                    </div>
+                  {matchResult.error ? (
+                    <div className="analysis-text" style={{color: 'var(--accent-coral)', fontWeight: 'bold'}}>{matchResult.error}</div>
+                  ) : (
+                    <>
+                      {matchResult.analysis && getTrafficLight(matchResult.analysis, lang) && (
+                        <div className="traffic-light" style={{ borderColor: getTrafficLight(matchResult.analysis, lang)!.color }}>
+                          <span className="emoji">{getTrafficLight(matchResult.analysis, lang)!.emoji}</span>
+                          <div>
+                            <div className="fit-status" style={{ color: getTrafficLight(matchResult.analysis, lang)!.color }}>Assessment</div>
+                            <div className="fit-text">{getTrafficLight(matchResult.analysis, lang)!.text}</div>
+                          </div>
+                        </div>
+                      )}
+                      <div className="analysis-text">{matchResult.analysis}</div>
+                    </>
                   )}
-                  <div className="analysis-text">{matchResult.analysis}</div>
                 </div>
               )}
             </div>
@@ -280,219 +285,70 @@ if (data.error) {
 
       <style jsx>{`
         .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
-        
-        /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; }
-        .logo { fontFamily: var(--display); font-weight: 800; text-decoration: none; color: var(--text); font-size: 1.2rem; }
+        .logo { font-family: var(--display); font-weight: 800; text-decoration: none; color: var(--text); font-size: 1.2rem; }
         .header-actions { display: flex; align-items: center; gap: 1rem; }
         .nav-link { text-decoration: none; color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
         .lang-switcher { display: flex; background: #fff; border: 2px solid var(--border); border-radius: 100px; overflow: hidden; }
         .lang-switcher button { border: none; background: none; padding: 0.4rem 0.7rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
         .lang-switcher button.active { background: var(--text); color: #fff; }
 
-        /* Hero Section - Responsive Grid */
-        .hero { 
-          display: grid; 
-          grid-template-columns: 1fr 1.2fr; 
-          gap: 3rem; 
-          padding: 2rem 0 4rem; 
-          align-items: start;
-        }
+        .hero { display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; padding: 2rem 0 4rem; align-items: start; }
         h1 { font-family: var(--display); font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.1; margin-bottom: 1rem; }
         .subtitle { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem; max-width: 450px; }
         .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .tag { background: #fff; border: 2px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 0.8rem; font-weight: 500; }
+        .tag { background: #fff; border: 2px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 0.8rem; font-weight: 500; opacity: 0; animation: tagIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .tag:nth-child(1) { animation-delay: 0.1s; }
+        .tag:nth-child(2) { animation-delay: 0.15s; }
+        .tag:nth-child(3) { animation-delay: 0.2s; }
+        .tag:nth-child(4) { animation-delay: 0.25s; }
+        .tag:nth-child(5) { animation-delay: 0.3s; }
         .tag.highlight { background: var(--accent-yellow); border-color: var(--text); }
 
-        /* Chat Window */
-        .chat-window { 
-          background: #fff; 
-          border: 3px solid var(--text); 
-          border-radius: 20px; 
-          box-shadow: 6px 6px 0 var(--text); 
-          overflow: hidden; 
-        }
+        @keyframes tagIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        .chat-window { background: #fff; border: 3px solid var(--text); border-radius: 20px; box-shadow: 6px 6px 0 var(--text); overflow: hidden; }
         .chat-header { background: var(--text); color: #fff; padding: 0.75rem 1.25rem; display: flex; align-items: center; justify-content: space-between; }
         .dots { display: flex; gap: 5px; }
         .dots span { width: 10px; height: 10px; border-radius: 50%; }
         .chat-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .chat-messages { height: 350px; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; background: #fafafa; }
         
-        .chat-messages { 
-  height: 350px; 
-  overflow-y: auto; 
-  padding: 1.25rem; 
-  display: flex; 
-  flex-direction: column; /* To jest kluczowa zmiana */
-  gap: 0.75rem; 
-  background: #fafafa;
-  width: 100%; /* Upewnij się, że zajmuje całą szerokość */
-}
-
-.message { 
-  max-width: 85%; 
-  padding: 0.75rem 1rem; 
-  border-radius: 15px; 
-  font-size: 0.9rem; 
-  line-height: 1.4;
-  word-wrap: break-word; /* Zapobiega wyjeżdżaniu tekstu poza dymek */
-  display: block; /* Wymusza bycie elementem blokowym */
-  flex-shrink: 0; /* Nie pozwól dymkom się zwężać, jeśli jest ich dużo */
-  width: fit-content; /* Dymek będzie tak szeroki jak tekst, ale nie szerszy niż max-width */
-}
-
-.message.user { 
-  align-self: flex-end; /* Pcha dymek użytkownika do prawej */
-  background: var(--text); 
-  color: #fff; 
-}
-
-.message.bot { 
-  align-self: flex-start; /* Pcha dymek bota do lewej */
-  background: #fff; 
-  border: 2px solid var(--border); 
-}
+        .message { max-width: 85%; padding: 0.75rem 1rem; border-radius: 15px; font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; }
+        .message.user { align-self: flex-end; background: var(--text); color: #fff; }
+        .message.bot { align-self: flex-start; background: #fff; border: 2px solid var(--border); }
         
+        .message.bot.typing { display: flex; gap: 4px; padding: 0.8rem 1.2rem; }
+        .typing-dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: typingBounce 1.4s infinite ease-in-out; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-8px); } }
+
         .chat-input-area { padding: 1rem; border-top: 2px solid var(--border); background: #fff; }
         .input-row { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
-        .input-row input { flex: 1; padding: 0.75rem; border: 2px solid var(--border); border-radius: 10px; font-family: inherit; outline: none; }
+        .input-row input { flex: 1; padding: 0.75rem; border: 2px solid var(--border); border-radius: 10px; outline: none; }
         .input-row button { background: var(--accent-yellow); border: 2px solid var(--text); padding: 0 1rem; border-radius: 10px; font-weight: 700; cursor: pointer; }
-        .quick-replies { display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .quick-replies { display: flex; gap: 0.4rem; overflow-x: auto; scrollbar-width: none; }
         .quick-replies button { white-space: nowrap; background: #fff; border: 2px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 0.75rem; cursor: pointer; }
 
-        /* Match Section */
         .match-section { padding: 2rem 0 5rem; }
-        .match-card { 
-          display: grid; 
-          grid-template-columns: 1fr 1.5fr; 
-          gap: 2.5rem; 
-          background: #fff; 
-          border: 3px solid var(--text); 
-          padding: 2.5rem; 
-          border-radius: 24px; 
-          box-shadow: 8px 8px 0 var(--text);
-        }
-        .match-features { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; font-size: 0.9rem; }
-        .match-actions textarea { width: 100%; height: 150px; padding: 1rem; border: 2px solid var(--border); border-radius: 12px; margin-bottom: 1rem; font-family: inherit; resize: none; }
-        .match-actions button { background: var(--text); color: #fff; padding: 0.8rem 1.5rem; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
-        .match-result { margin-top: 1.5rem; padding: 1.25rem; background: var(--bg); border-radius: 12px; }
+        .match-card { display: grid; grid-template-columns: 1fr 1.5fr; gap: 2.5rem; background: #fff; border: 3px solid var(--text); padding: 2.5rem; border-radius: 24px; box-shadow: 8px 8px 0 var(--text); }
+        .match-actions textarea { width: 100%; height: 150px; padding: 1rem; border: 2px solid var(--border); border-radius: 12px; margin-bottom: 1rem; resize: none; font-family: inherit; }
+        .match-actions button { background: var(--text); color: #fff; padding: 0.8rem 1.5rem; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .match-actions button:hover { transform: translateY(-2px); }
+        .match-result { margin-top: 1.5rem; padding: 1.25rem; background: var(--bg); border-radius: 12px; animation: slideInResult 0.5s ease-out; }
         .traffic-light { display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: #fff; border: 2px solid; border-radius: 10px; margin-bottom: 1rem; }
         .fit-status { font-weight: 800; font-family: var(--display); text-transform: uppercase; font-size: 0.8rem; }
+        .analysis-text { white-space: pre-wrap; font-size: 0.95rem; }
 
-        /* Footer */
-        .footer { text-align: center; padding: 3rem 0; border-top: 2px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
-        .footer-links { display: flex; justify-content: center; gap: 1rem; margin-top: 0.5rem; }
-        .footer-links a { color: var(--text-muted); text-decoration: none; }
+        @keyframes slideInResult { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 850px) {
           .hero, .match-card { grid-template-columns: 1fr; gap: 2rem; }
-          .match-card { padding: 1.5rem; }
           .hero-content { text-align: center; }
-          .subtitle { margin-left: auto; margin-right: auto; }
+          .subtitle { margin: 0 auto 2rem; }
           .tag-cloud { justify-content: center; }
-          h1 { font-size: 2.2rem; }
         }
-
-        @media (max-width: 480px) {
-          .header { flex-direction: column; gap: 1rem; }
-          .chat-messages { height: 300px; }
-          .input-row { flex-direction: column; }
-          .input-row button { padding: 0.75rem; }
-          .container { padding: 0 1rem; }
-        }
-          .tag {
-  opacity: 0;
-  animation: tagIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-/* Każdy kolejny tag pojawia się z opóźnieniem */
-.tag:nth-child(1) { animation-delay: 0.1s; }
-.tag:nth-child(2) { animation-delay: 0.15s; }
-.tag:nth-child(3) { animation-delay: 0.2s; }
-.tag:nth-child(4) { animation-delay: 0.25s; }
-.tag:nth-child(5) { animation-delay: 0.3s; }
-.tag:nth-child(6) { animation-delay: 0.35s; }
-
-@keyframes tagIn {
-  from { opacity: 0; transform: translateX(-10px) rotate(-2deg); }
-  to { opacity: 1; transform: translateX(0) rotate(0); }
-}
-
-/* --- 2. Interaktywne Przyciski (Neubrutalism feel) --- */
-button, .tag {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--text) !important;
-}
-
-button:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0 var(--text) !important;
-}
-
-/* --- 3. Pulsujący wskaźnik Job Match --- */
-.traffic-light {
-  position: relative;
-  overflow: hidden;
-  animation: slideInResult 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Efekt poświaty wokół koloru */
-.traffic-light::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  box-shadow: inset 0 0 20px rgba(255,255,255,0.5);
-  animation: pulseGlow 2s infinite;
-  pointer-events: none;
-}
-
-@keyframes pulseGlow {
-  0% { opacity: 0.3; }
-  50% { opacity: 0.7; }
-  100% { opacity: 0.3; }
-}
-
-/* --- 4. Efekt pisania bota (bardziej naturalny) --- */
-.message.bot.typing {
-  display: flex;
-  gap: 4px;
-  padding: 0.8rem 1.2rem;
-}
-
-.typing-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--text-muted);
-  border-radius: 50%;
-  animation: typingBounce 1.4s infinite ease-in-out;
-}
-
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typingBounce {
-  0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-8px); }
-}
-
-/* --- 5. Płynne pojawianie się tekstu analizy --- */
-.analysis-text {
-  animation: fadeInUp 0.8s ease-out;
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideInResult {
-  from { opacity: 0; transform: scale(0.95) translateY(10px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
       `}</style>
     </>
   );
