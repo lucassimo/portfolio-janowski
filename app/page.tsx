@@ -276,8 +276,8 @@ export default function Home() {
         <footer className="footer">
             <p>© 2026 Łukasz Janowski • No frontend devs were harmed • Just one FCCA + AI</p>
           <div className="footer-links">
-            <a href="www.linkedin.com/in/lukaszjanowskifcca">LinkedIn</a>
-            <a href="mailto:contact@janowski.biz">Email</a>
+            <a href="https://www.linkedin.com/in/lukaszjanowskifcca/">LinkedIn</a>
+            <a href="mailto:info@janowski.biz">Email</a>
           </div>
         </footer>
       </div>
