@@ -54,7 +54,7 @@ Key projects:
    - Delivered building-level forecasts: NBV, market value, day-one gain/loss
    - Result: Analysis supported CHF 21M+ annual cost reduction
 
-2. CS Tower Exit Analysis (Jan 2023)
+2. Zurich CBD Tower Exit Analysis (Jan 2023)
    - Identified CHF 6M termination fee offset by unamortized rent-free incentive
    - Demonstrated P&L neutral impact → contributed to favorable board decision
 
@@ -72,13 +72,13 @@ Key projects:
    - Total annual P&L scope: 200M CHF (rent, opex, capex)
    - Combined data from multiple sources into unified model
 
-5. Uetlihof Landlord Negotiations (2019)
-   - Impact scenario analysis for negotiations with Norwegian Pension Fund
+5. Zurich HQ Lease Renegotiation (2019)
+   - Impact scenario analysis for major landlord negotiations
    - Location: Largest office building in Switzerland
    - Annual rental: 47M CHF | Building required ~300M CHF capex works
 
 6. Geneva Sale & Leaseback (2019)
-   - Full financial analysis for Rue De Lausanne 11-19
+   - Full financial analysis for major Geneva office property
    - Sales proceeds: 260M CHF | Day-1 gain: 98M CHF
    - Independently rebuilt process, prepared C-suite approval deck
 
@@ -87,13 +87,13 @@ Key projects:
    - First in team to book reserves under Right of Use Asset regime
    - Total reserves booked: ~95M CHF
 
-8. 17 Columbus Courtyard Exit (2021)
+8. London Office Exit Analysis (2021)
    - Model comparing retention vs surrender: 192,000 sq ft, 35M CHF liability
    - Quantified 12M CHF P&L benefit from surrender
    - Result: Final negotiated exit fee was >25% lower than initial offer
 
-9. Raleigh Sale & Leaseback (2021)
-   - Financial analysis for US property
+9. US Office Sale & Leaseback (2021)
+   - Financial analysis for US office property
    - Highest bid: 83M CHF | Estimated gain: 64M CHF
    - Prepared materials for Business COO, CFO, CEO
 
@@ -157,8 +157,8 @@ QUANTIFIED IMPACT SUMMARY
 | Swiss Portfolio Strategy | 200M CHF P&L scope | Multi-scenario modeling |
 | Geneva SLB | 260M CHF proceeds / 98M CHF gain | Full analysis |
 | UK Reserve Methodology | ~95M CHF booked | Methodology design |
-| Columbus Courtyard Exit | 12M CHF P&L benefit | Cost-benefit model |
-| Raleigh SLB | 83M CHF / 64M CHF gain | Financial analysis |
+| London Office Exit | 12M CHF P&L benefit | Cost-benefit model |
+| US Office SLB | 83M CHF / 64M CHF gain | Financial analysis |
 
 Total: Analysis work supported decisions resulting in 100M+ CHF in cost optimization and transaction gains.
 
