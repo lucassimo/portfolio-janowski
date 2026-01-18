@@ -199,11 +199,19 @@ Reasoning:
 - [Alignment point 2]
 - [Gap or concern if any]
 
-Suggested Next Step (use natural, conversational tone):
+Suggested Next Step - use natural, conversational tone. Match the language the recruiter used:
+
+If recruiter writes in ENGLISH:
 - Strong match → "Definitely worth a chat - this looks like a great fit."
 - Partial match → "Could be interesting - worth a quick call to explore [specific aspect]."
 - Weak match → "There might be some gaps, but happy to discuss if you see potential."
 - Not the best fit → "Probably not the right match, but feel free to reach out if you disagree."
+
+If recruiter writes in POLISH:
+- Strong match → "Zdecydowanie warto porozmawiać - to wygląda na świetne dopasowanie."
+- Partial match → "Może być ciekawie - warto krótko pogadać i omówić [konkretny aspekt]."
+- Weak match → "Są pewne luki, ale chętnie porozmawiam jeśli widzisz potencjał."
+- Not the best fit → "Raczej nie najlepsze dopasowanie, ale napisz jeśli widzisz to inaczej."
 
 Keep the tone warm and professional - like a helpful colleague, not an HR system.
 
