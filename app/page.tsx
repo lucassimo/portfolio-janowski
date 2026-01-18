@@ -159,7 +159,7 @@ export default function Home() {
         <header className="header">
           <a href="#" className="logo">Łukasz Janowski</a>
           <div className="header-actions">
-            <a href="www.linkedin.com/in/lukaszjanowskifcca" target="_blank" className="nav-link">LinkedIn</a>
+            <a href="https://www.linkedin.com/in/lukaszjanowskifcca" target="_blank" className="nav-link">LinkedIn</a>
             <div className="lang-switcher">
               <button onClick={() => setLang('en')} className={lang === 'en' ? 'active' : ''}>EN</button>
               <button onClick={() => setLang('pl')} className={lang === 'pl' ? 'active' : ''}>PL</button>
