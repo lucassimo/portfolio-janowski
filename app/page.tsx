@@ -159,7 +159,7 @@ export default function Home() {
         <header className="header">
           <a href="#" className="logo">Łukasz Janowski</a>
           <div className="header-actions">
-            <a href="https://linkedin.com/in/lukaszjanowski" target="_blank" className="nav-link">LinkedIn</a>
+            <a href="www.linkedin.com/in/lukaszjanowskifcca" target="_blank" className="nav-link">LinkedIn</a>
             <div className="lang-switcher">
               <button onClick={() => setLang('en')} className={lang === 'en' ? 'active' : ''}>EN</button>
               <button onClick={() => setLang('pl')} className={lang === 'pl' ? 'active' : ''}>PL</button>
@@ -173,10 +173,9 @@ export default function Home() {
             <p className="subtitle">{T[lang]['hero.subtitle']}</p>
             <div className="tag-cloud">
               <span className="tag highlight">FCCA</span>
-              <span className="tag highlight">MBA</span>
-              <span className="tag">12+ years</span>
-              <span className="tag">200M+ CHF</span>
-              <span className="tag">21M savings</span>
+              <span className="tag">Credit Suisse</span>
+              <span className="tag">UBS</span>
+              <span className="tag">Citi</span>
             </div>
           </div>
 
